@@ -35,6 +35,10 @@ The 3D map and visibility simulation aren't the product on their own — they ar
 
 > Peel identifies commercial context around a billboard, scores the board's physical visibility, and turns that signal into targeted advertiser outreach.
 
+![Opportunity map — target accounts clustered into a geofenced hotspot with ranked, fit-scored clusters](docs/assets/opportunity-map.jpg)
+
+<div align="center"><sub>Peel maps where target accounts physically cluster — here a B2B tech-buyer hotspot in SoMa — and ranks each cluster by fit and board reach.</sub></div>
+
 ---
 
 ## Highlights
@@ -58,6 +62,24 @@ The 3D map and visibility simulation aren't the product on their own — they ar
 | **4. Outbound** | Drafts a personalized pitch per best-fit advertiser and stages rows for CRM / sequencing hand-off. |
 
 Every claim is scoped by what is **computed** (coordinates, nearby businesses, visibility geometry, enrichment) versus **modeled** (audience context, advertiser fit) versus a **future measurement layer** (brand-search lift, geofenced conversion). That boundary is what keeps the pitch credible.
+
+### Inside the app
+
+![3D city scene with live pedestrian, employee, and vehicle simulation](docs/assets/3d-scene.jpg)
+
+<div align="center"><sub>A full-screen 3D scene of the city with live pedestrian, ICP-employee, and vehicle simulation across 559 permitted SF boards.</sub></div>
+
+<br />
+
+![Physics-grounded visibility scoring and a ranked, contact-mapped Target ICP list](docs/assets/visibility-icp.jpg)
+
+<div align="center"><sub>Physics-grounded visibility scoring — visibility, recall, glance capture, time-to-notice, and scene-attention share — alongside a ranked, contact-mapped Target ICP list.</sub></div>
+
+<br />
+
+![Vision Studio journal replaying how a pedestrian sees a board from the street](docs/assets/vision-journal.jpg)
+
+<div align="center"><sub>Vision Studio replays how a specific pedestrian profile actually sees a board from the street, with SEEN / NOTICE / RECALL read-outs beside the creative brief driving the mockup.</sub></div>
 
 ---
 
@@ -175,6 +197,10 @@ docs/              design notes and screenshots
 ## License
 
 Released under the [MIT License](LICENSE).
+
+---
+
+![Peel — launch your physical ad campaigns where your buyers won't miss them](docs/assets/banner.png)
 
 <div align="center">
 
