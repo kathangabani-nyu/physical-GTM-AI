@@ -2,7 +2,7 @@
 
 # Peel — Reach buyers where screens can't
 
-**A physical GTM engine that finds where your accounts cluster in the real world, books the out-of-home boards that reach them, and turns physical presence into pipeline.**
+**Peel treats a billboard as an account-based marketing channel.** It finds the streets where your ideal customers concentrate, recommends real permitted billboard inventory there, generates creative from your existing brand rules, and predicts the attention it'll get from the pedestrians who are your ICPs.
 
 ![Peel — Reach buyers where screens can't](docs/assets/hero.png)
 
@@ -12,74 +12,77 @@
 [![Mapbox GL](https://img.shields.io/badge/Mapbox_GL-3-000000?logo=mapbox&logoColor=white)](https://www.mapbox.com/)
 [![deck.gl](https://img.shields.io/badge/deck.gl-9-6E40C9)](https://deck.gl/)
 [![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
-[![Convex](https://img.shields.io/badge/Convex-backend-EE342F)](https://convex.dev/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-gpt--4o_·_gpt--image--1-412991?logo=openai&logoColor=white)](https://openai.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 </div>
 
 ---
 
-## Overview
+## The problem
 
-Digital advertising is saturated, ad-blocked, and increasingly expensive per qualified impression. Meanwhile, the physical world — the billboards commuters pass, the corridors buyers walk — is still sold like real estate: static inventory, generic media kits, and manual outreach.
+Out-of-home (OOH) is one of the last large ad channels still bought on gut feel. Buying a billboard today means:
 
-**Peel closes that gap.** It treats out-of-home (OOH) advertising as a targeted, account-based growth channel. Given a company's website and ideal customer profile (ICP), Peel:
+- **You can't easily tell where your actual ICPs are** in a city.
+- **You have no way to predict whether a board will actually be visible** before you spend.
 
-1. **Discovers** where target accounts physically cluster across a city.
-2. **Scores** the real out-of-home inventory that reaches those clusters using geometry-grounded visibility signals.
-3. **Simulates** how a board is actually seen — line of sight, occlusion, dwell time, and creative saliency — in an interactive 3D scene.
-4. **Generates** board-specific creative and a personalized outbound pitch for each best-fit advertiser.
-5. **Exports** a campaign package (PDF) and stages outbound, ready to push into CRM and sequencing tools.
-
-The 3D map and visibility simulation aren't the product on their own — they are the **proof layer** inside a defensible sales motion.
-
-> Peel identifies commercial context around a billboard, scores the board's physical visibility, and turns that signal into targeted advertiser outreach.
+Meanwhile, every growth team already knows their ICP and runs ABM digitally. Peel asks: *what if a billboard were just another ABM surface* — targetable by account density, generatable from your brand, testable before spend, and wired straight into outbound?
 
 ![Opportunity map — target accounts clustered into a geofenced hotspot with ranked, fit-scored clusters](docs/assets/opportunity-map.jpg)
 
-<div align="center"><sub>Peel maps where target accounts physically cluster — here a B2B tech-buyer hotspot in SoMa — and ranks each cluster by fit and board reach.</sub></div>
+<div align="center"><sub>Peel clusters ICP-matched companies into geographic opportunity "blobs" — here a B2B tech-buyer hotspot in SoMa — and ranks each by fit and board reach.</sub></div>
 
 ---
 
-## Highlights
+## How it works
 
-- **Geospatial intelligence** — 559 real, permitted San Francisco billboards (scraped from the city's General Advertising Sign Program) rendered on a 3D Mapbox globe with `deck.gl` and `react-three-fiber` layers.
-- **Physics-grounded visibility scoring** — practical, defensible metrics (line of sight, building occlusion, apparent size, dwell time) computed from map geometry rather than invented conversion claims.
-- **Agent-based crowd & traffic simulation** — pedestrian and vehicle flows model who actually passes each board and how long they dwell.
-- **In-browser vision models** — billboard detection and creative saliency run client-side via `@huggingface/transformers` (WebGPU/WASM).
-- **LLM creative + outbound generation** — board-specific ad mockups and personalized pitches, with a graceful SVG fallback when no model key is configured.
-- **One-click campaign export** — a full PDF campaign package (opportunity, board buying facts, ranked target accounts, and proof) generated on the server with Playwright.
+The product is a **guided pipeline**. Each stage feeds the next.
 
----
-
-## Product Loop
-
-| Stage | What Peel does |
-| --- | --- |
-| **1. Accounts** | Infers the creative brief and ICP from a company's site, then discovers physical-world "opportunity blobs" where matching accounts concentrate. |
-| **2. Boards** | Ranks permitted billboard inventory inside each blob by ICP density × physical visibility × dwell × creative suitability. |
-| **3. Creative** | Generates a board-specific creative concept and mockup composited into the local scene. |
-| **4. Outbound** | Drafts a personalized pitch per best-fit advertiser and stages rows for CRM / sequencing hand-off. |
-
-Every claim is scoped by what is **computed** (coordinates, nearby businesses, visibility geometry, enrichment) versus **modeled** (audience context, advertiser fit) versus a **future measurement layer** (brand-search lift, geofenced conversion). That boundary is what keeps the pitch credible.
+| # | Stage | What happens |
+| --- | --- | --- |
+| **1** | **Onboard from a URL** | Drop in a company website. Peel scrapes the homepage and infers a structured **creative brief** (identity, voice, color palette, core message, CTA) and an **ICP** (audience, segment, intent signals) — shown as an animated "scan." |
+| **2** | **Find opportunity blobs** | Against a dataset of San Francisco businesses, Fiber AI clusters companies matching the ICP into geographic **opportunity blobs** — e.g. *"SoMa Finance SaaS Cluster."* Blobs re-rank live as the ICP is edited. |
+| **3** | **Pick placements** | For the selected blob, Peel ranks real, permitted billboard inventory (**SF General Advertising Sign** records) by visibility, dwell time, and proximity to target accounts. |
+| **4** | **Generate local creative** | It produces billboard creative tuned to the brief and street context, then composites it onto the real sign geometry in a 3D scene. |
+| **5** | **Test attention** | A 3D map runs a crowd + traffic simulation; **Vision Studio** uses a vision-language model to predict what a passer-by actually notices — *board found? / first thing the eye lands on / brand recall / legibility / shareability* — from Street View or an uploaded photo. |
+| **6** | **Export & hand off** | One click renders a **PDF campaign report**; matched accounts drop into an outbound queue wired to **Orange Slice** for coordinated follow-up. |
 
 ### Inside the app
 
 ![3D city scene with live pedestrian, employee, and vehicle simulation](docs/assets/3d-scene.jpg)
 
-<div align="center"><sub>A full-screen 3D scene of the city with live pedestrian, ICP-employee, and vehicle simulation across 559 permitted SF boards.</sub></div>
+<div align="center"><sub>A depth-correct 3D city (Mapbox + deck.gl) with interleaved 3D buildings, a live crowd simulation, traffic flow, and pedestrian "vision" agents — across 559 permitted SF boards.</sub></div>
 
 <br />
 
 ![Physics-grounded visibility scoring and a ranked, contact-mapped Target ICP list](docs/assets/visibility-icp.jpg)
 
-<div align="center"><sub>Physics-grounded visibility scoring — visibility, recall, glance capture, time-to-notice, and scene-attention share — alongside a ranked, contact-mapped Target ICP list.</sub></div>
+<div align="center"><sub>Visibility, recall, glance capture, time-to-notice, and scene-attention share scored per board, beside a ranked, contact-mapped Target ICP list.</sub></div>
 
 <br />
 
 ![Vision Studio journal replaying how a pedestrian sees a board from the street](docs/assets/vision-journal.jpg)
 
-<div align="center"><sub>Vision Studio replays how a specific pedestrian profile actually sees a board from the street, with SEEN / NOTICE / RECALL read-outs beside the creative brief driving the mockup.</sub></div>
+<div align="center"><sub>Vision Studio replays how a specific pedestrian profile actually sees a board from the street — with SEEN / NOTICE / RECALL read-outs beside the creative brief that drives the mockup.</sub></div>
+
+---
+
+## Notable features
+
+- **URL → creative brief + ICP** — an animated "scan" of the company site returns a structured brief and ideal-customer profile.
+- **Opportunity blobs** — physical-world clusters of ICP companies, scored and live-re-ranked as the ICP is edited.
+- **Real permitted inventory** — ranked SF General Advertising Sign records with city permit deep-links, visibility scores, and dwell estimates — not invented placements.
+- **AI-generated local creative** — board art generated from the brief and composited onto the actual sign geometry.
+- **Depth-correct 3D city** — a Mapbox + deck.gl scene with interleaved 3D buildings, live crowd simulation, traffic flow, and pedestrian "vision" agents that capture what they'd see.
+- **Vision Studio attention testing** — a VLM scores a street scene for what grabs the eye, brand recall, legibility, and shareability, with a heuristic saliency fallback.
+- **Live environment** — current weather and time-of-day (via Open-Meteo) drive the look of the scene.
+- **One-click hand-off** — a PDF campaign report and an Orange Slice outbound queue.
+
+---
+
+## Why we built this
+
+OOH is one of the last large ad channels that's still bought on gut feel — while every growth team already knows their ICP and runs ABM digitally. We wanted to ask: what if a billboard were just another ABM surface — **targetable by account density, generatable, testable before spend, and connected to outbound?** Peel is that experiment.
 
 ---
 
@@ -89,36 +92,59 @@ Every claim is scoped by what is **computed** (coordinates, nearby businesses, v
 ┌──────────────────────────────────────────────────────────────┐
 │  Next.js 15 App Router (React 19, TypeScript, Tailwind v4)     │
 │                                                                │
-│  /            Campaign workspace — blobs, ranked boards,       │
-│               creative + outbound flow                         │
+│  /            Guided pipeline — brief/ICP scan, opportunity    │
+│               blobs, ranked boards, creative + outbound        │
 │  /map         Full-screen 3D Mapbox + deck.gl scene            │
-│  /vision      Vision Studio — in-browser detection & saliency  │
+│  /vision      Vision Studio — VLM attention testing            │
 │  /sightline   Line-of-sight / visibility inspector             │
 │                                                                │
-│  /api/*       Opportunities · creative · outbound · streetview │
-│               vision-simulate · campaign-report (PDF) · …      │
-└───────────────┬───────────────────────────┬──────────────────┘
-                │                            │
-        ┌───────▼────────┐          ┌────────▼─────────┐
-        │  Convex         │          │  orangeslice /    │
-        │  (realtime      │          │  Fiber AI         │
-        │   backend)      │          │  (enrichment,     │
-        └────────────────┘          │   outbound data)  │
-                                     └──────────────────┘
+│  /api/*       company-brief · opportunities · generate-creative│
+│               vision-simulate · streetview · current-conditions│
+│               outbound · campaign-report (PDF) · …             │
+└──────┬─────────────────┬──────────────────┬──────────────────┘
+       │                 │                  │
+ ┌─────▼──────┐   ┌───────▼───────┐   ┌──────▼───────────┐
+ │  OpenAI     │   │  Fiber AI      │   │  Orange Slice     │
+ │  gpt-4o     │   │  (account      │   │  (outbound /      │
+ │  gpt-image-1│   │   enrichment)  │   │   sales-ops)      │
+ └────────────┘   └───────────────┘   └──────────────────┘
+       │                 │                  │
+ ┌─────▼─────────────────▼──────────────────▼──────────────┐
+ │  Street View · Open-Meteo · SF GASP + Accela permits ·   │
+ │  SF roads & pedestrian-count datasets (prefetched)       │
+ └──────────────────────────────────────────────────────────┘
 ```
 
-### Tech stack
+---
 
-| Layer | Technology |
-| --- | --- |
-| **Framework** | Next.js 15 (App Router), React 19, TypeScript 5.7 |
-| **3D / Geospatial** | Mapbox GL, deck.gl, react-map-gl, Three.js, react-three-fiber, drei |
-| **ML in the browser** | `@huggingface/transformers` (billboard detection, saliency) |
-| **Backend / realtime** | Convex |
-| **Enrichment & outbound** | orangeslice / Fiber AI |
-| **Server rendering** | Playwright (PDF campaign export, street-view compositing) |
-| **Validation** | Zod |
-| **Styling** | Tailwind CSS v4, PostCSS |
+## Tech stack
+
+**Framework & UI**
+
+- Next.js 15 (App Router) · React 19 · TypeScript
+- Tailwind CSS v4
+- Zod for schema validation
+
+**Maps, 3D & simulation**
+
+- Mapbox GL + react-map-gl
+- deck.gl (core, layers, mapbox, react, widgets) for interleaved 3D layers, crowd, and traffic-flow rendering
+- three.js + @react-three/fiber + @react-three/drei for 3D billboard meshes
+- @huggingface/transformers for in-browser ML (saliency)
+
+**AI & vision**
+
+- OpenAI — `gpt-4o` vision for attention scoring, `gpt-image-1` for creative generation
+- Google Street View imagery for real-scene attention testing
+
+**Automation & data**
+
+- Playwright — site screenshots and headless PDF report rendering
+- Open-Meteo — live weather / current conditions
+- SF Planning General Advertising Sign Program records + Accela permit portal for real inventory
+- SF roads & pedestrian-count datasets (prefetched at build)
+- Fiber AI for account enrichment
+- Orange Slice for the outbound / sales-ops workflow
 
 ---
 
@@ -126,7 +152,7 @@ Every claim is scoped by what is **computed** (coordinates, nearby businesses, v
 
 ```bash
 # 1. Configure environment
-cp .env.local.example .env.local   # add Mapbox + optional model/enrichment keys
+cp .env.local.example .env.local   # Mapbox, OpenAI, Fiber AI, Orange Slice keys
 
 # 2. Install dependencies
 npm install
@@ -137,20 +163,20 @@ npm run dev
 
 Open **http://localhost:3000**.
 
-The app runs without paid keys: opportunity scoring, the 3D scene, and creative generation all fall back to bundled data and SVG mockups. Add keys in `.env.local` to enable live enrichment, LLM creative, and street-view compositing.
+The app is resilient to missing keys: opportunity scoring, the 3D scene, and creative generation fall back to bundled data, heuristic saliency, and SVG mockups. Add keys in `.env.local` to enable live enrichment, `gpt-image-1` creative, VLM attention scoring, and Street View compositing.
 
 ### Useful scripts
 
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start the local dev server |
-| `npm run build` | Prefetch map data and build for production |
+| `npm run build` | Prefetch map/pedestrian data and build for production |
 | `npm run convex:dev` | Run the Convex backend locally |
 | `node scripts/scrape-billboards.mjs` | Re-pull the live SF billboard inventory |
 
 ---
 
-## Billboard Data
+## Billboard data
 
 Real San Francisco billboard inventory ships in [`data/`](data/), scraped from SF Planning's **General Advertising Sign Program (GASP)** — the city's registry of permitted billboards. The current dataset contains **559 signs with exact WGS84 coordinates**.
 
@@ -159,7 +185,7 @@ Real San Francisco billboard inventory ships in [`data/`](data/), scraped from S
 | `data/sf-billboards.geojson` | Mapbox-ready `FeatureCollection` of points |
 | `data/sf-billboards.csv` | Spreadsheet / analysis format |
 
-Each sign carries its street address, permit status and lifecycle dates, city permit number with Accela links, and assigned planner contact. GASP is *physical inventory*, not a rental marketplace — bookable metadata (dimensions, impressions, CPM, pricing) would come from commercial OOH platforms or seller-provided data, and the app is explicit about which fields are estimated.
+Each sign carries its street address, permit status and lifecycle dates, city permit number with Accela deep-links, and assigned planner contact. GASP is *physical inventory*, not a rental marketplace — bookable metadata (dimensions, impressions, CPM, pricing) would come from commercial OOH platforms or seller-provided data, and the app is explicit about which fields are estimated.
 
 Refresh the data at any time (no API key required):
 
@@ -169,13 +195,13 @@ node scripts/scrape-billboards.mjs
 
 ---
 
-## Repository Layout
+## Repository layout
 
 ```
 app/
   components/      3D map, billboard meshes, crowd & traffic layers, flows
   lib/             visibility, saliency, attention, creative, campaign report
-  api/             opportunities, creative, outbound, vision, PDF export
+  api/             company-brief, opportunities, creative, vision, streetview, PDF
   map/ vision/ sightline/   feature routes
 convex/            realtime backend functions
 data/              scraped SF billboard inventory + enrichment caches
@@ -188,9 +214,9 @@ docs/              design notes and screenshots
 
 ## Roadmap
 
-- **Measurement layer** — brand-search lift, QR / short-code response, geofenced conversion, and holdout-market experiments to move from modeled fit to attributed ROAS.
+- **Measurement layer** — brand-search lift, QR / short-code response, geofenced conversion, and holdout-market experiments to move from modeled attention to attributed ROAS.
 - **National inventory** — extend beyond SF GASP to commercial OOH marketplaces.
-- **CRM push** — direct sync of staged outbound into HubSpot, Salesforce, and Attio.
+- **CRM push** — direct sync of the staged outbound queue into HubSpot, Salesforce, and Attio.
 
 ---
 
